@@ -108,8 +108,6 @@
 		}
 	
 		function vote_execute() {
-			console.log("투표하기 버튼 클릭");
-
 			var user_name = $("input[name=user_name]").val().trim();
 
 			if(!(user_name.length > 0)) {
@@ -131,27 +129,24 @@
 				 */
 				value_arr.push(select_num*1);
 			}
-
+/* 
 			console.log("value_arr: " + value_arr);
-			
+ */
+
 			var new_data = [];
 			for(var i=0;i<cur_data.length;i++) {
 /* 				
 				console.log(cur_data[i]);
  */
-				console.log(i+"번째"); 				
 				if(value_arr.indexOf(i) > -1) {
-					console.log("true");
-					console.log(i+"번째 value 있음!");
-					var b = cur_data[i];
-					console.log("b " + b);
+					var new_name = cur_data[i].name;
+					
 					var new_members = cur_data[i].members;
-					console.log("11: " + new_members);
 					new_members.push(user_name);
-					console.log("22: " + new_members);
-					new_data.push(new_members);
+
+					var new_obj = '{"name":"'+new_name+'","members":'+JSON.stringify(new_members)+'}';
+					new_data.push(JSON.parse(new_obj));
 				} else {
-					console.log("false");
 					new_data.push(cur_data[i]);
 				}
 			}
