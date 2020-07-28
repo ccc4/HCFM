@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>HCFM</title>
 <!-- CSS only -->
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
 
@@ -33,17 +33,17 @@
 			<table class="vote_table">
 			<!-- 
 				<tr>
-					<td><input type="checkbox" id="select_1"></td>
+					<td><input type="checkbox" id="select_1" value="select_1"></td>
 					<td><label for="select_1">7월28일</label></td>
 					<td>1명</td>
 				</tr>
 				<tr>
-					<td><input type="checkbox" id="select_2"></td>
+					<td><input type="checkbox" id="select_2" value="select_1"></td>
 					<td><label for="select_2">7월29일</label></td>
 					<td>2명</td>
 				</tr>
 				<tr>
-					<td><input type="checkbox" id="select_3"></td>
+					<td><input type="checkbox" id="select_3" value="select_1"></td>
 					<td><label for="select_3">7월30일</label></td>
 					<td>3명</td>
 				</tr>
@@ -56,8 +56,24 @@
 	</div>
 	
 	<script type="text/javascript">
-		var jsonLocation = '/static/jsonData_tmp.json';
-		$.getJSON(jsonLocation, (data)=> {
+
+		var cur_data = [];
+		
+		firstLoad();
+	
+		function firstLoad() {
+			var jsonLocation = '/static/jsonData_tmp.json';
+			$.getJSON(jsonLocation, (data)=> {
+				makeTable(data);
+			})
+		}
+
+		function makeTable(data) {
+			console.log(data);
+			cur_data = data;
+
+			$(".vote_table").empty();
+			
 			$.each(data, (i, item)=> {
 				/* 
 				console.log(item.name);
@@ -77,20 +93,70 @@
 						 */
 						members.push(item.members[j]);
 					}
+					/* 
 				console.log(i + " [name: " + name + ", length: " + length + ", members: " + members);
-
+ */
 				var tr = '';
 				tr += '<tr>';
-				tr += '<td><input type="checkbox" id="select_' + i + '"></td>';
+				tr += '<td><input class="vote_checkbox" type="checkbox" id="select_' + i + '" value="select_' + i + '"></td>';
 				tr += '<td><label for="select_' + i + '">' + name + '</label></td>';
-				tr += '<td>' + length + '명</td>';
+				tr += '<td>(' + length + ')</td>';
 				tr += '</tr>';
 
 				$(".vote_table").append(tr);
 			});
-		})
+		}
+	
+		function vote_execute() {
+			console.log("투표하기 버튼 클릭");
 
-		
+			var user_name = $("input[name=user_name]").val().trim();
+
+			if(!(user_name.length > 0)) {
+				alert("이름적어");
+				return;
+			}
+			
+			var checkArr = []; 
+			$(".vote_checkbox:checked").each(function() {
+				checkArr.push($(this).val());			
+			});
+
+			var value_arr = [];
+			for(var i=0;i<checkArr.length;i++) {
+				var select = checkArr[i];
+				var select_num = select.split("_")[1];
+				/* 
+				console.log(select_num);
+				 */
+				value_arr.push(select_num*1);
+			}
+
+			console.log("value_arr: " + value_arr);
+			
+			var new_data = [];
+			for(var i=0;i<cur_data.length;i++) {
+/* 				
+				console.log(cur_data[i]);
+ */
+				console.log(i+"번째"); 				
+				if(value_arr.indexOf(i) > -1) {
+					console.log("true");
+					console.log(i+"번째 value 있음!");
+					var b = cur_data[i];
+					console.log("b " + b);
+					var new_members = cur_data[i].members;
+					console.log("11: " + new_members);
+					new_members.push(user_name);
+					console.log("22: " + new_members);
+					new_data.push(new_members);
+				} else {
+					console.log("false");
+					new_data.push(cur_data[i]);
+				}
+			}
+			makeTable(new_data);
+		}
 
 	</script>
 </body>
